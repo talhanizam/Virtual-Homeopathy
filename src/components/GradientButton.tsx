@@ -6,7 +6,7 @@ type Props = PropsWithChildren<{
 	as?: "button" | "a";
 	href?: string;
 	className?: string;
-}> & ButtonHTMLAttributes<HTMLButtonElement>;
+}> & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'>;
 
 export default function GradientButton({ children, as = "button", href, className = "", ...rest }: Props) {
 	const base = "relative inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 will-change-transform";
