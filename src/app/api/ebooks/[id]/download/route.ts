@@ -4,7 +4,7 @@ import { createServiceRoleClient } from '@/lib/supabase-server';
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
-	const supaSSR = createClientServer();
+	const supaSSR = await createClientServer();
 	const { data: { user } } = await supaSSR.auth.getUser();
 	if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
