@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 		if (!path || typeof path !== 'string') {
 			return NextResponse.json({ error: 'Missing path' }, { status: 400 });
 		}
-		const supa = createServiceRoleClient();
+		const supa = await createServiceRoleClient();
 		const { data, error } = await supa.storage.from('ebook-covers').createSignedUrl(path, 3600);
 		if (error || !data?.signedUrl) {
 			return NextResponse.json({ error: 'Unable to sign cover' }, { status: 404 });

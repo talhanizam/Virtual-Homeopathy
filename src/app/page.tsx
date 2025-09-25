@@ -5,7 +5,7 @@ import GradientButton from "@/components/GradientButton";
 import { createServiceRoleClient } from "@/lib/supabase-server";
 
 export default async function Home() {
-	const supa = createServiceRoleClient();
+	const supa = await createServiceRoleClient();
 	let featured: { id: string; slug?: string; title: string; description: string | null; price_inr: number; cover_url: string | null }[] = [];
 	try {
 		const { data, error } = await supa

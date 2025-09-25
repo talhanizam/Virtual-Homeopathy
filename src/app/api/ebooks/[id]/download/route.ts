@@ -8,7 +8,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 	const { data: { user } } = await supaSSR.auth.getUser();
 	if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-	const service = createServiceRoleClient();
+	const service = await createServiceRoleClient();
 	const { data: purchase } = await service
 		.from('purchases')
 		.select('ebook_id, ebooks(ebook_file_path)')

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 		}
 		if (!userId) return NextResponse.json({ error: 'Unauthorized: please log in again' }, { status: 401 });
 
-		const service = createServiceRoleClient();
+		const service = await createServiceRoleClient();
 		const { data: ebook, error: ebookErr } = await service
 			.from('ebooks')
 			.select('id, title, price_inr, is_published')

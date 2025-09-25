@@ -8,8 +8,8 @@ export function createClientBrowser() {
 	);
 }
 
-export function createClientServer() {
-	const cookieStore = cookies();
+export async function createClientServer() {
+	const cookieStore = await cookies();
 	return createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
@@ -30,10 +30,24 @@ export function createClientServer() {
 	);
 }
 
-export function createServiceRoleClient() {
+export async function createServiceRoleClient() {
+	const cookieStore = await cookies();
 	return createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL as string,
 		process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-		{ auth: { persistSession: false } }
+		{
+			auth: { persistSession: false },
+			cookies: {
+				get(name: string) {
+					return cookieStore.get(name)?.value;
+				},
+				set(name: string, value: string, options: CookieOptions) {
+					cookieStore.set({ name, value, ...options });
+				},
+				remove(name: string, options: CookieOptions) {
+					cookieStore.set({ name, value: '', ...options });
+				},
+			},
+		}
 	);
 }

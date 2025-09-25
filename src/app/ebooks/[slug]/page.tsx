@@ -8,7 +8,7 @@ export default async function EbookDetailsPage({ params }: { params: Promise<{ s
 	const { slug: raw } = await params;
 	const slug = decodeURIComponent(raw).trim();
 	const supa = await createClientServer();
-	const service = createServiceRoleClient();
+	const service = await createServiceRoleClient();
 
 	// Get user to check purchase status
 	const { data: { user } } = await supa.auth.getUser();

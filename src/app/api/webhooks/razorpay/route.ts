@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
 	if (!orderId) return NextResponse.json({ ok: true });
 
-	const supa = createServiceRoleClient();
+	const supa = await createServiceRoleClient();
 	// Find our internal order by razorpay_order_id
 	const { data: orderRow } = await supa
 		.from('orders')

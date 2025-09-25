@@ -1,6 +1,10 @@
 // Analytics utility for tracking user interactions
 // You can integrate with Google Analytics, Mixpanel, or other analytics services
 
+declare global {
+  function gtag(...args: any[]): void;
+}
+
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
   if (typeof window !== 'undefined') {
     // Google Analytics 4
@@ -44,8 +48,3 @@ export const analytics = {
     trackEvent('video_view', { video_id: videoId }),
 };
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}

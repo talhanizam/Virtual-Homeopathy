@@ -6,7 +6,8 @@ type Props = PropsWithChildren<{
 	as?: "button" | "a";
 	href?: string;
 	className?: string;
-}> & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'>;
+	onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}> & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' | 'onDragStart' | 'onDrag' | 'onDragEnd' | 'onDragEnter' | 'onDragExit' | 'onDragLeave' | 'onDragOver' | 'onDrop'>;
 
 export default function GradientButton({ children, as = "button", href, className = "", ...rest }: Props) {
 	const base = "relative inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold text-white transition-all duration-300 will-change-transform";

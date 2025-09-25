@@ -16,7 +16,7 @@ export default async function AccountPage() {
 		);
 	}
 
-	const service = createServiceRoleClient();
+	const service = await createServiceRoleClient();
 	const { data: rows } = await service
 		.from('purchases')
 		.select('ebook_id, ebooks(title, ebook_file_path)')
