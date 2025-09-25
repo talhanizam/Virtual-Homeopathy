@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClientServer } from '@/lib/supabase-server';
 import { createServiceRoleClient } from '@/lib/supabase-server';
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+	const { id } = await params;
 	const supaSSR = createClientServer();
 	const { data: { user } } = await supaSSR.auth.getUser();
 	if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -12,7 +13,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 		.from('purchases')
 		.select('ebook_id, ebooks(ebook_file_path)')
 		.eq('user_id', user.id)
-		.eq('ebook_id', params.id)
+		.eq('ebook_id', id)
 		.single();
 
 	if (!purchase) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
