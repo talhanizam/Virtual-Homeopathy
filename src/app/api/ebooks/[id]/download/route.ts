@@ -30,7 +30,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 	}
 
 	// Always fetch path directly from ebooks to avoid nested-select issues
-	const { data: ebookRow } = await service
+	const { data: ebookRow, error: ebookErr } = await service
 		.from('ebooks')
 		.select('ebook_file_path, ebook_file_bucket, file_path, pdf_path, path')
 		.eq('id', id)
@@ -41,10 +41,16 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 	let explicitBucket: string | null = row.ebook_file_bucket ?? null;
 
 	if (!rawPath || typeof rawPath !== 'string') {
-		return NextResponse.json({ error: 'File path not configured for this ebook', debug: { hasRow: !!ebookRow, fields: Object.keys(row || {}) } }, { status: 404 });
-	}
-	if (!rawPath || typeof rawPath !== 'string') {
-		return NextResponse.json({ error: 'File path not configured for this ebook' }, { status: 404 });
+		return NextResponse.json({ 
+			error: 'File path not configured for this ebook', 
+			debug: { 
+				hasRow: !!ebookRow, 
+				fields: Object.keys(row || {}), 
+				ebookError: ebookErr?.message || null,
+				searchedId: id,
+				hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+			} 
+		}, { status: 404 });
 	}
 
 	// If a full public URL was stored, extract bucket and path
