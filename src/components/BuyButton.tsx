@@ -52,6 +52,8 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 						const err = await verifyRes.json().catch(() => ({}));
 						throw new Error(err?.error || 'Verification failed');
 					}
+					const ok = await verifyRes.json().catch(() => ({}));
+					console.log('verify result', ok);
 					window.location.href = "/account";
 				} catch (e: any) {
 					console.error('Verification error', e);
