@@ -11,19 +11,13 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 	const service = await createServiceRoleClient();
 	const { data: purchase } = await service
 		.from('purchases')
-		.select('ebook_id, ebooks(ebook_file_path, ebook_file_bucket)')
+		.select('ebook_id')
 		.eq('user_id', user.id)
 		.eq('ebook_id', id)
 		.single();
 
-	let rawPath: string | null = null;
-	let explicitBucket: string | null = null;
-
-	if (purchase) {
-		rawPath = (purchase as any).ebooks?.ebook_file_path as string | null;
-		explicitBucket = (purchase as any).ebooks?.ebook_file_bucket as string | null;
-	} else {
-		// No purchase row: allow if there is a paid order and fetch ebook path directly
+	// If no purchase, allow if there is a paid order
+	if (!purchase) {
 		const { data: paidOrder } = await service
 			.from('orders')
 			.select('id')
@@ -32,14 +26,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 			.eq('status', 'paid')
 			.maybeSingle();
 		if (!paidOrder) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-		const { data: ebookRow } = await service
-			.from('ebooks')
-			.select('ebook_file_path, ebook_file_bucket')
-			.eq('id', id)
-			.maybeSingle();
-		rawPath = (ebookRow as any)?.ebook_file_path ?? null;
-		explicitBucket = (ebookRow as any)?.ebook_file_bucket ?? null;
 	}
+
+	// Always fetch path directly from ebooks to avoid nested-select issues
+	const { data: ebookRow } = await service
+		.from('ebooks')
+		.select('ebook_file_path, ebook_file_bucket')
+		.eq('id', id)
+		.maybeSingle();
+
+	let rawPath: string | null = (ebookRow as any)?.ebook_file_path ?? null;
+	let explicitBucket: string | null = (ebookRow as any)?.ebook_file_bucket ?? null;
 	if (!rawPath || typeof rawPath !== 'string') {
 		return NextResponse.json({ error: 'File path not configured for this ebook' }, { status: 404 });
 	}
