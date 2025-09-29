@@ -101,4 +101,69 @@ export async function POST(req: Request) {
   }
 }
 
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const razorpay_order_id = url.searchParams.get('razorpay_order_id') || undefined;
+    const razorpay_payment_id = url.searchParams.get('razorpay_payment_id') || undefined;
+    const razorpay_signature = url.searchParams.get('razorpay_signature') || undefined;
+
+    if (!razorpay_order_id) {
+      return NextResponse.redirect(new URL('/account?payment=missing_order', req.url));
+    }
+
+    let verified = false;
+    const secret = process.env.RAZORPAY_KEY_SECRET as string;
+    if (razorpay_payment_id && razorpay_signature) {
+      const expected = crypto
+        .createHmac('sha256', secret)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest('hex');
+      verified = expected === razorpay_signature;
+    }
+
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.redirect(new URL('/account?payment=server_misconfig', req.url));
+    }
+    const supa = await createServiceRoleClient();
+
+    const { data: orderRow, error: orderErr } = await supa
+      .from('orders')
+      .select('id, user_id, ebook_id, status')
+      .eq('razorpay_order_id', razorpay_order_id)
+      .single();
+    if (orderErr || !orderRow) {
+      return NextResponse.redirect(new URL('/account?payment=order_not_found', req.url));
+    }
+
+    if (!verified) {
+      const key_id = process.env.RAZORPAY_KEY_ID as string;
+      const key_secret = process.env.RAZORPAY_KEY_SECRET as string;
+      const rzp = new Razorpay({ key_id, key_secret });
+      try {
+        const result = await (rzp as any).orders.fetchPayments(razorpay_order_id);
+        const captured = Array.isArray(result?.items) && result.items.find((p: any) => p.status === 'captured');
+        verified = !!captured;
+      } catch {}
+    }
+
+    if (!verified) {
+      return NextResponse.redirect(new URL('/account?payment=not_verified', req.url));
+    }
+
+    await supa
+      .from('orders')
+      .update({ status: 'paid', razorpay_payment_id: razorpay_payment_id || null, razorpay_signature: razorpay_signature || null })
+      .eq('id', orderRow.id);
+
+    await supa
+      .from('purchases')
+      .upsert({ user_id: orderRow.user_id, ebook_id: orderRow.ebook_id, order_id: orderRow.id }, { onConflict: 'user_id,ebook_id' as any });
+
+    return NextResponse.redirect(new URL('/account?payment=success', req.url));
+  } catch {
+    return NextResponse.redirect(new URL('/account?payment=server_error', req.url));
+  }
+}
+
 
