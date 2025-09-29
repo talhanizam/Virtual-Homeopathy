@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createClientServer } from '@/lib/supabase-server';
 import { createServiceRoleClient } from '@/lib/supabase-server';
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-	const id = decodeURIComponent(params.id).trim();
+export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id: rawId } = await params;
+    const id = decodeURIComponent(rawId).trim();
 	const supaSSR = await createClientServer();
 	const { data: { user } } = await supaSSR.auth.getUser();
 	if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
