@@ -30,6 +30,7 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			alert("Invalid order response. Please try again.");
 			return;
 		}
+		const callbackUrl = `${window.location.origin}/api/checkout/verify`;
 		const options = {
 			key: payload.keyId,
 			amount: payload.amount,
@@ -37,7 +38,7 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			name: "Doctor Store",
 			description: "Ebook purchase",
 			order_id: payload.orderId,
-			callback_url: "/api/checkout/verify",
+			callback_url: callbackUrl,
 			redirect: true,
 			handler: async (response: any) => {
 				try {
