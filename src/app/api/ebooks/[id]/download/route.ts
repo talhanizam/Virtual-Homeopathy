@@ -31,12 +31,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 	// Always fetch path directly from ebooks to avoid nested-select issues
 	const { data: ebookRow } = await service
 		.from('ebooks')
-		.select('ebook_file_path, ebook_file_bucket')
+		.select('ebook_file_path, ebook_file_bucket, file_path, pdf_path, path')
 		.eq('id', id)
 		.maybeSingle();
 
-	let rawPath: string | null = (ebookRow as any)?.ebook_file_path ?? null;
-	let explicitBucket: string | null = (ebookRow as any)?.ebook_file_bucket ?? null;
+	const row: any = ebookRow || {};
+	let rawPath: string | null = row.ebook_file_path ?? row.file_path ?? row.pdf_path ?? row.path ?? null;
+	let explicitBucket: string | null = row.ebook_file_bucket ?? null;
+
+	if (!rawPath || typeof rawPath !== 'string') {
+		return NextResponse.json({ error: 'File path not configured for this ebook', debug: { hasRow: !!ebookRow, fields: Object.keys(row || {}) } }, { status: 404 });
+	}
 	if (!rawPath || typeof rawPath !== 'string') {
 		return NextResponse.json({ error: 'File path not configured for this ebook' }, { status: 404 });
 	}
