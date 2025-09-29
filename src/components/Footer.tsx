@@ -7,6 +7,11 @@ export default function Footer() {
 					<a href="/ebooks" className="hover:text-[#1E3A8A]">Ebooks</a>
 					<a href="/youtube" className="hover:text-[#1E3A8A]">Videos</a>
 					<a href="/account" className="hover:text-[#1E3A8A]">Account</a>
+				<a href="/contact-us" className="hover:text-[#1E3A8A]">Contact</a>
+				<a href="/privacy-policy" className="hover:text-[#1E3A8A]">Privacy</a>
+				<a href="/terms-and-conditions" className="hover:text-[#1E3A8A]">Terms</a>
+				<a href="/cancellations-and-refunds" className="hover:text-[#1E3A8A]">Refunds</a>
+				<a href="/shipping-policy" className="hover:text-[#1E3A8A]">Delivery</a>
 				</nav>
 			</div>
 		</footer>
