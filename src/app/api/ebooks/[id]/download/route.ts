@@ -100,6 +100,20 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 		}
 	}
 	if (!signedUrl) {
+		// Fallback: attempt case-insensitive and space-normalized match by listing bucket root
+		try {
+			const listRes = await service.storage.from(bucket).list('', { limit: 1000 });
+			const objects = Array.isArray(listRes.data) ? listRes.data : [];
+			const norm = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase();
+			const wanted = norm(rawPath);
+			const found = objects.find((o: any) => norm(o.name) === wanted);
+			if (found?.name) {
+				const alt = await service.storage.from(bucket).createSignedUrl(found.name, 300);
+				if (alt.data?.signedUrl) {
+					return NextResponse.redirect(alt.data.signedUrl);
+				}
+			}
+		} catch {}
 		const message = typeof lastErr?.message === 'string' ? lastErr.message : 'File not found';
 		return NextResponse.json({ error: message, bucket, pathTried: candidates }, { status: 404 });
 	}
