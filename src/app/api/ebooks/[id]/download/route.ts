@@ -16,9 +16,30 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 		.eq('ebook_id', id)
 		.single();
 
-	if (!purchase) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-	let rawPath = (purchase as any).ebooks?.ebook_file_path as string | null;
-	const explicitBucket = (purchase as any).ebooks?.ebook_file_bucket as string | null;
+	let rawPath: string | null = null;
+	let explicitBucket: string | null = null;
+
+	if (purchase) {
+		rawPath = (purchase as any).ebooks?.ebook_file_path as string | null;
+		explicitBucket = (purchase as any).ebooks?.ebook_file_bucket as string | null;
+	} else {
+		// No purchase row: allow if there is a paid order and fetch ebook path directly
+		const { data: paidOrder } = await service
+			.from('orders')
+			.select('id')
+			.eq('user_id', user.id)
+			.eq('ebook_id', id)
+			.eq('status', 'paid')
+			.maybeSingle();
+		if (!paidOrder) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+		const { data: ebookRow } = await service
+			.from('ebooks')
+			.select('ebook_file_path, ebook_file_bucket')
+			.eq('id', id)
+			.maybeSingle();
+		rawPath = (ebookRow as any)?.ebook_file_path ?? null;
+		explicitBucket = (ebookRow as any)?.ebook_file_bucket ?? null;
+	}
 	if (!rawPath || typeof rawPath !== 'string') {
 		return NextResponse.json({ error: 'File path not configured for this ebook' }, { status: 404 });
 	}
