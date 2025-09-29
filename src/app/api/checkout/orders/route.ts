@@ -101,6 +101,7 @@ export async function POST(req: Request) {
 			amount: order.amount,
 			currency: order.currency,
 			keyId: key_id,
+			prefill: userId,
 		});
 	} catch (e: any) {
 		const message = e?.message || 'Server error';

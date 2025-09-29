@@ -37,8 +37,26 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			name: "Doctor Store",
 			description: "Ebook purchase",
 			order_id: payload.orderId,
-			handler: () => {
-				window.location.href = "/account?status=processing";
+			handler: async (response: any) => {
+				try {
+					const verifyRes = await fetch('/api/checkout/verify', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							razorpay_order_id: response.razorpay_order_id,
+							razorpay_payment_id: response.razorpay_payment_id,
+							razorpay_signature: response.razorpay_signature,
+						}),
+					});
+					if (!verifyRes.ok) {
+						const err = await verifyRes.json().catch(() => ({}));
+						throw new Error(err?.error || 'Verification failed');
+					}
+					window.location.href = "/account";
+				} catch (e: any) {
+					console.error('Verification error', e);
+					alert(e?.message || 'Could not verify payment. Please contact support.');
+				}
 			},
 			modal: { ondismiss: () => console.warn('Checkout dismissed') },
 			theme: { color: "#1E3A8A" },
