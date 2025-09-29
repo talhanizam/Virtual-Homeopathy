@@ -26,6 +26,10 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			alert(payload?.error || "Failed to create order");
 			return;
 		}
+		if (!payload?.orderId || !payload?.keyId || !payload?.amount || !payload?.currency) {
+			alert("Invalid order response. Please try again.");
+			return;
+		}
 		const options = {
 			key: payload.keyId,
 			amount: payload.amount,
@@ -36,9 +40,14 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			handler: () => {
 				window.location.href = "/account?status=processing";
 			},
+			modal: { ondismiss: () => console.warn('Checkout dismissed') },
 			theme: { color: "#1E3A8A" },
 		} as any;
 		const rzp = new (window as any).Razorpay(options);
+		rzp.on('payment.failed', (response: any) => {
+			console.error('Razorpay payment failed', response);
+			alert(response?.error?.description || 'Payment failed. Please try again.');
+		});
 		rzp.open();
 	}
 
