@@ -54,7 +54,7 @@ export default async function EbookDetailsPage({ params }: { params: Promise<{ s
 		coverUrl = signErr ? null : signed?.signedUrl ?? null;
 	}
 
-	// Check if user has purchased this ebook
+	// Check if user has purchased this ebook (via purchases or paid orders)
 	let isPurchased = false;
 	if (user) {
 		const { data: purchase } = await service
@@ -64,6 +64,16 @@ export default async function EbookDetailsPage({ params }: { params: Promise<{ s
 			.eq('ebook_id', data.id)
 			.single();
 		isPurchased = !!purchase;
+		if (!isPurchased) {
+			const { data: paidOrder } = await service
+				.from('orders')
+				.select('id')
+				.eq('user_id', user.id)
+				.eq('ebook_id', data.id)
+				.eq('status', 'paid')
+				.maybeSingle();
+			isPurchased = !!paidOrder;
+		}
 	}
 
 	return (

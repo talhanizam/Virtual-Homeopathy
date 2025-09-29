@@ -17,6 +17,19 @@ export default async function AccountPage() {
 	}
 
 	const service = await createServiceRoleClient();
+
+	// Backfill purchases from any paid orders (self-heal in case verify/webhook missed)
+	const { data: paidOrders } = await service
+		.from('orders')
+		.select('id, ebook_id')
+		.eq('user_id', user.id)
+		.eq('status', 'paid');
+
+	if (Array.isArray(paidOrders) && paidOrders.length > 0) {
+		const backfillPayload = paidOrders.map((o: any) => ({ user_id: user.id, ebook_id: o.ebook_id, order_id: o.id }));
+		await service.from('purchases').upsert(backfillPayload, { onConflict: 'user_id,ebook_id' as any });
+	}
+
 	const { data: rows } = await service
 		.from('purchases')
 		.select('ebook_id, ebooks(title, ebook_file_path)')
