@@ -18,6 +18,38 @@ export default async function AccountPage() {
 
 	const service = await createServiceRoleClient();
 
+	// Reconcile any 'created' orders by checking Razorpay for captured payments
+	try {
+		const key_id = process.env.RAZORPAY_KEY_ID as string | undefined;
+		const key_secret = process.env.RAZORPAY_KEY_SECRET as string | undefined;
+		if (key_id && key_secret) {
+			const Razorpay = (await import('razorpay')).default;
+			const rzp = new Razorpay({ key_id, key_secret });
+			const { data: createdOrders } = await service
+				.from('orders')
+				.select('id, razorpay_order_id, ebook_id')
+				.eq('user_id', user.id)
+				.eq('status', 'created');
+			if (Array.isArray(createdOrders) && createdOrders.length > 0) {
+				for (const o of createdOrders) {
+					try {
+						const result: any = await (rzp as any).orders.fetchPayments(o.razorpay_order_id);
+						const captured = Array.isArray(result?.items) && result.items.find((p: any) => p.status === 'captured');
+						if (captured) {
+							await service
+								.from('orders')
+								.update({ status: 'paid', razorpay_payment_id: captured.id, razorpay_signature: null })
+								.eq('id', o.id);
+							await service
+								.from('purchases')
+								.upsert({ user_id: user.id, ebook_id: o.ebook_id, order_id: o.id }, { onConflict: 'user_id,ebook_id' as any });
+						}
+					} catch {}
+				}
+			}
+		}
+	} catch {}
+
 	// Backfill purchases from any paid orders (self-heal in case verify/webhook missed)
 	const { data: paidOrders } = await service
 		.from('orders')
