@@ -32,13 +32,13 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 	// Always fetch path directly from ebooks to avoid nested-select issues
 	const { data: ebookRow, error: ebookErr } = await service
 		.from('ebooks')
-		.select('ebook_file_path, ebook_file_bucket, file_path, pdf_path, path')
+		.select('ebook_file_path')
 		.eq('id', id)
 		.maybeSingle();
 
 	const row: any = ebookRow || {};
-	let rawPath: string | null = row.ebook_file_path ?? row.file_path ?? row.pdf_path ?? row.path ?? null;
-	let explicitBucket: string | null = row.ebook_file_bucket ?? null;
+	let rawPath: string | null = row.ebook_file_path ?? null;
+	let explicitBucket: string | null = null;
 
 	if (!rawPath || typeof rawPath !== 'string') {
 		return NextResponse.json({ 
