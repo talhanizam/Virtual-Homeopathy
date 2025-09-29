@@ -60,18 +60,36 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 		if (path.startsWith('/')) path = path.slice(1);
 	} catch {}
 
-	// Attempt signing with derived bucket, then fallback to default bucket if needed
+	// Attempt signing with derived bucket, trying a few path variants
 	const trySign = async (bkt: string, p: string) => {
 		const { data: signed, error } = await service.storage.from(bkt).createSignedUrl(p, 300);
-		return { signedUrl: signed?.signedUrl || null, error };
+		return { signedUrl: signed?.signedUrl || null, error } as { signedUrl: string | null, error: any };
 	};
 
-	let { signedUrl } = await trySign(bucket, path);
+	const candidates: string[] = Array.from(new Set([
+		path,
+		path.replace(/^\/+/, ''),
+		path.replace(/^\/+/, '').replace(/^public\//, ''),
+		path.replace(/\\/g, '/'),
+	]));
+
+	let signedUrl: string | null = null;
+	let lastErr: any = null;
+	for (const p of candidates) {
+		const res = await trySign(bucket, p);
+		if (res.signedUrl) { signedUrl = res.signedUrl; break; }
+		lastErr = res.error || lastErr;
+	}
 	if (!signedUrl && bucket !== 'ebook-files') {
-		({ signedUrl } = await trySign('ebook-files', path));
+		for (const p of candidates) {
+			const res = await trySign('ebook-files', p);
+			if (res.signedUrl) { signedUrl = res.signedUrl; bucket = 'ebook-files'; path = p; break; }
+			lastErr = res.error || lastErr;
+		}
 	}
 	if (!signedUrl) {
-		return NextResponse.json({ error: 'File not found' }, { status: 404 });
+		const message = typeof lastErr?.message === 'string' ? lastErr.message : 'File not found';
+		return NextResponse.json({ error: message, bucket, pathTried: candidates }, { status: 404 });
 	}
 
 	return NextResponse.redirect(signedUrl);
