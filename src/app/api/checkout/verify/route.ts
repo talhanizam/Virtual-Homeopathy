@@ -7,7 +7,19 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
+    let body: any = null;
+    const contentType = req.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      body = await req.json();
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const form = await req.text();
+      body = Object.fromEntries(new URLSearchParams(form) as any);
+    } else {
+      // Try json as fallback
+      try { body = await req.json(); } catch {}
+    }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body || {};
     if (!razorpay_order_id) {
       return NextResponse.json({ error: 'Missing order id' }, { status: 400 });
     }
@@ -22,6 +34,9 @@ export async function POST(req: Request) {
       verified = expected === razorpay_signature;
     }
 
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json({ error: 'Server misconfiguration: SUPABASE_SERVICE_ROLE_KEY is not set' }, { status: 500 });
+    }
     const supa = await createServiceRoleClient();
     const { data: orderRow, error: orderErr } = await supa
       .from('orders')
@@ -53,14 +68,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Payment not verified' }, { status: 400 });
     }
 
-    await supa
+    const { error: orderUpdateErr } = await supa
       .from('orders')
       .update({ status: 'paid', razorpay_payment_id: razorpay_payment_id || null, razorpay_signature: razorpay_signature || null })
       .eq('id', orderRow.id);
+    if (orderUpdateErr) {
+      return NextResponse.json({ error: `DB error (orders update): ${orderUpdateErr.message}` }, { status: 500 });
+    }
 
-    await supa
+    const { error: purchaseErr } = await supa
       .from('purchases')
       .upsert({ user_id: orderRow.user_id, ebook_id: orderRow.ebook_id, order_id: orderRow.id }, { onConflict: 'user_id,ebook_id' as any });
+    if (purchaseErr) {
+      return NextResponse.json({ error: `DB error (purchases upsert): ${purchaseErr.message}` }, { status: 500 });
+    }
 
     const { data: purchaseRow } = await supa
       .from('purchases')
@@ -68,6 +89,11 @@ export async function POST(req: Request) {
       .eq('user_id', orderRow.user_id)
       .eq('ebook_id', orderRow.ebook_id)
       .maybeSingle();
+
+    // If Razorpay triggered a redirect POST, redirect to account
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      return NextResponse.redirect(new URL('/account', req.url));
+    }
 
     return NextResponse.json({ ok: true, purchase: purchaseRow || null });
   } catch (e: any) {

@@ -37,6 +37,8 @@ export default function BuyButton({ ebookId, className }: BuyButtonProps) {
 			name: "Doctor Store",
 			description: "Ebook purchase",
 			order_id: payload.orderId,
+			callback_url: "/api/checkout/verify",
+			redirect: true,
 			handler: async (response: any) => {
 				try {
 					const verifyRes = await fetch('/api/checkout/verify', {
