@@ -135,7 +135,7 @@ export default async function EbookDetailsPage({ params }: { params: Promise<{ s
 									</div>
 								) : (
 									<div>
-										<BuyButton ebookId={data.id} className="w-full px-6 py-3 rounded-lg bg-[#1E3A8A] text-white hover:opacity-90 font-medium" />
+										<BuyButton ebookId={data.id} bookSlug={data.slug} className="w-full px-6 py-3 rounded-lg bg-[#1E3A8A] text-white hover:opacity-90 font-medium" />
 									</div>
 								)
 							) : (

@@ -59,6 +59,10 @@ export default function EbooksPage() {
 	async function buy(ebookId: string) {
 		const { data } = await supabase.auth.getSession();
 		const token = data.session?.access_token;
+		if (!token) {
+			window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+			return;
+		}
 		const res = await fetch("/api/checkout/orders", {
 			method: "POST",
 			headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },

@@ -4,16 +4,18 @@ import { createClientBrowser } from "@/lib/supabase-browser";
 type BuyButtonProps = {
 	ebookId: string;
 	className?: string;
+	bookSlug?: string;
 };
 
-export default function BuyButton({ ebookId, className }: BuyButtonProps) {
+export default function BuyButton({ ebookId, className, bookSlug }: BuyButtonProps) {
 	const supabase = createClientBrowser();
 
 	async function buy() {
 		const { data } = await supabase.auth.getSession();
 		const token = data.session?.access_token;
 		if (!token) {
-			window.location.href = `/login?next=${encodeURIComponent(`/ebooks/${ebookId}`)}`;
+			const redirectUrl = bookSlug ? `/ebooks/${bookSlug}` : `/ebooks`;
+			window.location.href = `/login?next=${encodeURIComponent(redirectUrl)}`;
 			return;
 		}
 		const res = await fetch("/api/checkout/orders", {

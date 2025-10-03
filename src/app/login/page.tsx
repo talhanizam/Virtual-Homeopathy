@@ -1,16 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClientBrowser } from "@/lib/supabase-browser";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import GradientButton from "@/components/GradientButton";
 import FloatingShapes from "@/components/FloatingShapes";
 
 export default function LoginPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	// Get the redirect URL from query params
+	const nextUrl = searchParams.get('next') || '/account';
 
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -23,7 +27,7 @@ export default function LoginPage() {
 			setError(error.message);
 			return;
 		}
-		router.push("/account");
+		router.push(nextUrl);
 	}
 
 	return (
