@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import FloatingShapes from "@/components/FloatingShapes";
 
-export default function ReaderPage({ params }: { params: { id: string } }) {
+export default function ReaderPage({ params }: { params: Promise<{ id: string }> }) {
+	const resolvedParams = use(params);
 	const [url, setUrl] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -11,11 +12,11 @@ export default function ReaderPage({ params }: { params: { id: string } }) {
 	useEffect(() => {
 		(async () => {
 			try {
-				const res = await fetch(`/api/ebooks/${params.id}/download`, { redirect: 'manual' as any });
-				if (res.status >= 300 && res.status < 400) {
-					const location = res.headers.get('Location');
-					setUrl(location);
-				} else if (!res.ok) {
+				const res = await fetch(`/api/ebooks/${resolvedParams.id}/read`);
+				if (res.ok) {
+					const data = await res.json();
+					setUrl(data.url);
+				} else {
 					const data = await res.json().catch(() => null);
 					setError(data?.error || 'Failed to load ebook');
 				}
@@ -25,7 +26,7 @@ export default function ReaderPage({ params }: { params: { id: string } }) {
 				setLoading(false);
 			}
 		})();
-	}, [params.id]);
+	}, [resolvedParams.id]);
 
 	if (loading) {
 		return (
@@ -92,7 +93,7 @@ export default function ReaderPage({ params }: { params: { id: string } }) {
 						🖨️ Print
 					</button>
 					<Link 
-						href={`/api/ebooks/${params.id}/download`}
+						href={`/api/ebooks/${resolvedParams.id}/download`}
 						className="px-3 py-1 text-sm text-[#6B7280] hover:text-[#1E3A8A] transition-colors"
 					>
 						📥 Download

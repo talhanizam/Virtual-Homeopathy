@@ -1,4 +1,4 @@
-// ✅ src/app/api/ebooks/[id]/download/route.ts
+// ✅ src/app/api/ebooks/[id]/read/route.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { createClientServer } from "@/lib/supabase-server";
 import { createClient } from "@supabase/supabase-js"; // ✅ use direct client for signing
@@ -82,10 +82,10 @@ export async function GET(
   if (path.startsWith(bucket + "/")) path = path.slice(bucket.length + 1);
   if (path.startsWith("/")) path = path.slice(1);
 
-  // 6️⃣ Try to create a signed URL
+  // 6️⃣ Try to create a signed URL (longer expiry for reading)
   const { data: signed, error } = await service.storage
     .from(bucket)
-    .createSignedUrl(path, 300);
+    .createSignedUrl(path, 3600); // 1 hour expiry for reading
 
   if (!signed?.signedUrl || error) {
     // 🧠 Debug info if file not found
@@ -102,6 +102,9 @@ export async function GET(
     );
   }
 
-  // 7️⃣ Redirect to signed URL (browser will download/open)
-  return NextResponse.redirect(signed.signedUrl);
+  // 7️⃣ Return the signed URL directly (for iframe embedding)
+  return NextResponse.json({ 
+    url: signed.signedUrl,
+    expiresAt: new Date(Date.now() + 3600 * 1000).toISOString()
+  });
 }

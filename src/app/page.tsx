@@ -92,8 +92,8 @@ export default async function Home() {
 						<p className="text-[#374151] mt-4">Through Virtual Homeopathy, my focus is on practical, modern learning — using remedy clusters, comparisons, and clinical storytelling to make homeopathy clear, relevant, and easy to apply.</p>
 					</div>
 					<div className="rounded-3xl bg-white p-6 ring-1 ring-[#E5E7EB] shadow-sm">
-						<p className="text-[#10B981] font-semibold">100k+ readers</p>
-						<p className="text-[#6B7280]">Trust indicators and outcomes.</p>
+						<p className="text-[#10B981] font-semibold">21+ years experience</p>
+						<p className="text-[#6B7280]">Clinical and teaching expertise.</p>
 					</div>
 				</div>
 			</section>

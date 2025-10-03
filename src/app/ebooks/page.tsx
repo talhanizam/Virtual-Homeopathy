@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createClientBrowser } from "@/lib/supabase-browser";
 import GradientButton from "@/components/GradientButton";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Ebook = { id: string; slug: string; title: string; description: string | null; price_inr: number; cover_image_path: string | null };
 
@@ -10,6 +11,7 @@ type EbookWithCoverUrl = Ebook & { cover_url?: string | null };
 
 export default function EbooksPage() {
 	const supabase = createClientBrowser();
+	const router = useRouter();
 	const [ebooks, setEbooks] = useState<EbookWithCoverUrl[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export default function EbooksPage() {
 				<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					{ebooks.map(e => (
 						<Link key={e.id} href={`/ebooks/${e.slug}`} className="group relative rounded-3xl bg-white ring-1 ring-[#E5E7EB] p-5 shadow-[0_20px_60px_rgba(17,24,39,0.06)] overflow-hidden transition-transform duration-300 hover:-translate-y-1">
-							<div className="relative z-10 flex flex-col gap-4">
+							<div className="relative z-10 flex flex-col h-full">
 								<div className="h-48 rounded-2xl overflow-hidden ring-1 ring-[#E5E7EB]">
 									{e.cover_url ? (
 										<img src={e.cover_url} alt={e.title} className="w-full h-full object-cover" />
@@ -104,29 +106,33 @@ export default function EbooksPage() {
 										<div className="w-full h-full bg-[linear-gradient(135deg,#D6E4FF_0%,#EDE9FE_100%)]" />
 									)}
 								</div>
-								<h3 className="text-lg font-semibold text-[#111827]">{e.title}</h3>
-								<div className="mt-2 flex items-center justify-between">
-									<span className="text-[#111827] font-bold">₹{e.price_inr}</span>
-									{ownedSet.has(String(e.id)) ? (
-										<div className="flex gap-2">
-											<Link
-												onClick={(evt) => evt.stopPropagation()}
-												className="px-3 py-2 text-sm rounded-lg bg-[#1E3A8A] text-white hover:opacity-90"
-												href={`/api/ebooks/${e.id}/download`}
-											>
-												📥 Download
-											</Link>
-											<Link
-												onClick={(evt) => evt.stopPropagation()}
-												className="px-3 py-2 text-sm rounded-lg ring-1 ring-[#E5E7EB] hover:bg-[#F9FAFB]"
-												href={`/reader/${e.id}`}
-											>
-												📖 Read
-											</Link>
-										</div>
-									) : (
-										<GradientButton onClick={(evt) => { evt.preventDefault(); buy(e.id); }}>Buy Now</GradientButton>
-									)}
+								<div className="flex-1 flex flex-col justify-between mt-4">
+									<h3 className="text-lg font-semibold text-[#111827] min-h-[4.5rem] leading-tight">{e.title}</h3>
+									<div className="mt-4 flex items-center justify-between">
+										<span className="text-[#111827] font-bold">₹{e.price_inr}</span>
+										{ownedSet.has(String(e.id)) ? (
+											<div className="flex gap-2">
+												<button
+													onClick={(evt) => { evt.preventDefault(); evt.stopPropagation(); window.location.href = `/api/ebooks/${e.id}/download`; }}
+													className="px-3 py-2 text-sm rounded-lg bg-[#1E3A8A] text-white hover:opacity-90"
+													type="button"
+												>
+													📥 Download
+												</button>
+												<button
+													onClick={(evt) => { evt.preventDefault(); evt.stopPropagation(); router.push(`/reader/${e.id}`); }}
+													className="px-3 py-2 text-sm rounded-lg ring-1 ring-[#E5E7EB] hover:bg-[#F9FAFB]"
+													type="button"
+												>
+													📖 Read
+												</button>
+											</div>
+										) : (
+											<div className="flex justify-end">
+												<GradientButton onClick={(evt) => { evt.preventDefault(); buy(e.id); }}>Buy Now</GradientButton>
+											</div>
+										)}
+									</div>
 								</div>
 							</div>
 						</Link>

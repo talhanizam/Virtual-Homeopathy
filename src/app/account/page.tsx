@@ -95,24 +95,26 @@ export default async function AccountPage() {
 						<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 							{purchases.map(p => (
 								<div key={p.id} className="group relative rounded-3xl bg-white backdrop-blur ring-1 ring-[#E5E7EB] p-6 shadow-[0_20px_60px_rgba(17,24,39,0.06)] overflow-hidden transition-transform duration-300 hover:-translate-y-1">
-									<div className="flex flex-col gap-4">
-										<div>
-											<h3 className="text-lg font-semibold text-[#111827] mb-2">{p.title}</h3>
-											<p className="text-sm text-[#6B7280]">Available for download and online reading</p>
-										</div>
-										<div className="flex gap-3">
-											<Link 
-												className="flex-1 text-center rounded-xl px-4 py-2 text-white bg-[#1E3A8A] hover:bg-[#3B82F6] transition-colors text-sm font-medium" 
-												href={`/api/ebooks/${p.id}/download`}
-											>
-												📥 Download
-											</Link>
-											<Link 
-												className="flex-1 text-center rounded-xl px-4 py-2 ring-1 ring-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors text-sm font-medium" 
-												href={`/reader/${p.id}`}
-											>
-												📖 Read Online
-											</Link>
+									<div className="flex flex-col h-full">
+										<div className="flex-1 flex flex-col justify-between">
+											<div>
+												<h3 className="text-lg font-semibold text-[#111827] mb-2 min-h-[4.5rem] leading-tight">{p.title}</h3>
+												<p className="text-sm text-[#6B7280]">Available for download and online reading</p>
+											</div>
+											<div className="flex gap-3 mt-4">
+												<Link 
+													className="flex-1 text-center rounded-xl px-4 py-2 text-white bg-[#1E3A8A] hover:bg-[#3B82F6] transition-colors text-sm font-medium" 
+													href={`/api/ebooks/${p.id}/download`}
+												>
+													📥 Download
+												</Link>
+												<Link 
+													className="flex-1 text-center rounded-xl px-4 py-2 ring-1 ring-[#E5E7EB] hover:bg-[#F9FAFB] transition-colors text-sm font-medium" 
+													href={`/reader/${p.id}`}
+												>
+													📖 Read Online
+												</Link>
+											</div>
 										</div>
 									</div>
 								</div>
