@@ -19,7 +19,13 @@ export default function SignupPage() {
 		setError(null);
 		setMessage(null);
 		const supabase = createClientBrowser();
-		const { error } = await supabase.auth.signUp({ email, password });
+		const { error } = await supabase.auth.signUp({ 
+			email, 
+			password,
+			options: {
+				emailRedirectTo: `${window.location.origin}/auth/confirmed`
+			}
+		});
 		setLoading(false);
 		if (error) {
 			setError(error.message);
