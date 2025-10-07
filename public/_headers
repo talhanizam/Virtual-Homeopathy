@@ -1,0 +1,9 @@
+# Disable caching for icons to avoid stale favicon on CDN
+/favicon.ico
+  Cache-Control: no-store
+/apple-touch-icon.png
+  Cache-Control: no-store
+/apple-touch-icon-precomposed.png
+  Cache-Control: no-store
+/logo.png
+  Cache-Control: no-store

@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 	creator: "Dr. Reshma Nizam",
 	publisher: "Virtual Homeopathy",
 	icons: {
-        icon: "/logo.png",
-        shortcut: "/logo.png",
-        apple: "/logo.png",
-    },
+		icon: "/logo.png?v=2",
+		shortcut: "/logo.png?v=2",
+		apple: "/logo.png?v=2",
+	},
 	robots: {
 		index: true,
 		follow: true,
@@ -59,7 +59,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<head>
-				<link rel="icon" href="/logo.png" sizes="any" />
+				<link rel="icon" type="image/png" href="/logo.png?v=2" sizes="any" />
+				<link rel="shortcut icon" type="image/png" href="/logo.png?v=2" />
+				<link rel="apple-touch-icon" href="/logo.png?v=2" />
 			</head>
 			<body className="bg-white text-[#111827]">
 				<NavAuth />
