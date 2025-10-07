@@ -26,7 +26,7 @@ export default function ShippingPolicyPage() {
         <div>
           <h2 className="text-lg font-semibold">Contact</h2>
           <p>
-            For delivery/access issues, contact <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a>
+            For delivery/access issues, contact <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a>
             with your order ID.
           </p>
         </div>

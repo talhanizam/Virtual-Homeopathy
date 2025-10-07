@@ -52,13 +52,13 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-lg font-semibold">Your Rights</h2>
           <p>
             You may request access, correction, or deletion of your personal information by
-            contacting us at <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a>.
+            contacting us at <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a>.
           </p>
         </div>
         <div>
           <h2 className="text-lg font-semibold">Contact</h2>
           <p>
-            Questions about this policy? Email <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a>.
+            Questions about this policy? Email <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a>.
           </p>
         </div>
       </section>

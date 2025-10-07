@@ -42,7 +42,7 @@ export default function TermsAndConditionsPage() {
           <h2 className="text-lg font-semibold">Refunds</h2>
           <p>
             Due to the nature of digital goods, all sales are final and non-refundable. If you were
-            charged multiple times in error, contact us at <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a> with your order ID.
+            charged multiple times in error, contact us at <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a> with your order ID.
           </p>
         </div>
         <div>
@@ -69,7 +69,7 @@ export default function TermsAndConditionsPage() {
         <div>
           <h2 className="text-lg font-semibold">Contact</h2>
           <p>
-            Questions about these terms? Email <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a>.
+            Questions about these terms? Email <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a>.
           </p>
         </div>
       </section>

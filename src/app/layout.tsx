@@ -11,6 +11,11 @@ export const metadata: Metadata = {
 	authors: [{ name: "Dr. Reshma Nizam" }],
 	creator: "Dr. Reshma Nizam",
 	publisher: "Virtual Homeopathy",
+	icons: {
+        icon: "/logo.png",
+        shortcut: "/logo.png",
+        apple: "/logo.png",
+    },
 	robots: {
 		index: true,
 		follow: true,
@@ -53,6 +58,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<head>
+				<link rel="icon" href="/logo.png" sizes="any" />
+			</head>
 			<body className="bg-white text-[#111827]">
 				<NavAuth />
 				{children}

@@ -21,7 +21,7 @@ export default function ContactUsPage() {
 
       <section className="mt-8 space-y-2 text-sm">
         <div>
-          <span className="font-medium">Email:</span> <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a>
+          <span className="font-medium">Email:</span> <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a>
         </div>
       </section>
 

@@ -3,6 +3,7 @@ import { createServiceRoleClient } from "@/lib/supabase-server";
 import BuyButton from "@/components/BuyButton";
 import Link from "next/link";
 import FloatingShapes from "@/components/FloatingShapes";
+import Image from "next/image";
 
 export default async function EbookDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
 	const { slug: raw } = await params;
@@ -89,9 +90,11 @@ export default async function EbookDetailsPage({ params }: { params: Promise<{ s
 				<div className="grid gap-8 md:grid-cols-3">
 					<div className="md:col-span-1">
 						<div className="h-80 rounded-2xl overflow-hidden ring-1 ring-[#E5E7EB] bg-white shadow-lg">
-							{coverUrl ? (
-								<img src={coverUrl} alt={data.title} className="w-full h-full object-cover" />
-							) : (
+								{coverUrl ? (
+									<div className="relative h-full">
+										<Image src={coverUrl} alt={data.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+									</div>
+								) : (
 								<div className="w-full h-full bg-[linear-gradient(135deg,#D6E4FF_0%,#EDE9FE_100%)]" />
 							)}
 						</div>

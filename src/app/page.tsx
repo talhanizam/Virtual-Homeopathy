@@ -4,6 +4,7 @@ import FloatingShapes from "@/components/FloatingShapes";
 import GradientButton from "@/components/GradientButton";
 import { createServiceRoleClient } from "@/lib/supabase-server";
 
+
 export default async function Home() {
 	const supa = await createServiceRoleClient();
 	let featured: { id: string; slug?: string; title: string; description: string | null; price_inr: number; cover_url: string | null }[] = [];
@@ -36,7 +37,7 @@ export default async function Home() {
 			<section className="relative mx-auto max-w-6xl px-6 pt-20 pb-16">
 				<div className="grid items-center gap-10 md:grid-cols-2">
 					<div>
-						<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[#111827]">
+					<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[#111827]">
 							Virtual Homeopathy
 						</h1>
 						<p className="mt-5 text-lg text-[#374151] max-w-prose">

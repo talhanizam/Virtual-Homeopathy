@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { createClientBrowser } from "@/lib/supabase-browser";
 import GradientButton from "@/components/GradientButton";
 import Link from "next/link";
@@ -103,9 +104,9 @@ export default function EbooksPage() {
 					{ebooks.map(e => (
 						<Link key={e.id} href={`/ebooks/${e.slug}`} className="group relative rounded-3xl bg-white ring-1 ring-[#E5E7EB] p-5 shadow-[0_20px_60px_rgba(17,24,39,0.06)] overflow-hidden transition-transform duration-300 hover:-translate-y-1">
 							<div className="relative z-10 flex flex-col h-full">
-								<div className="h-48 rounded-2xl overflow-hidden ring-1 ring-[#E5E7EB]">
+								<div className="relative h-48 rounded-2xl overflow-hidden ring-1 ring-[#E5E7EB]">
 									{e.cover_url ? (
-										<img src={e.cover_url} alt={e.title} className="w-full h-full object-cover" />
+										<Image src={e.cover_url} alt={e.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
 									) : (
 										<div className="w-full h-full bg-[linear-gradient(135deg,#D6E4FF_0%,#EDE9FE_100%)]" />
 									)}

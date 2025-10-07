@@ -47,7 +47,7 @@ export default function CancellationsRefundsPage() {
         <div>
           <h2 className="text-lg font-semibold">How to Request</h2>
           <p>
-            Email <a href="mailto:drreshev@gmail.com" className="underline">drreshev@gmail.com</a> with your order ID and payment reference. We may request additional verification for
+            Email <a href="mailto:virtualhomeopathy@gmail.com" className="underline">virtualhomeopathy@gmail.com</a> with your order ID and payment reference. We may request additional verification for
             security.
           </p>
         </div>
