@@ -6,11 +6,17 @@ import FloatingShapes from "@/components/FloatingShapes";
 export default async function AccountPage() {
 	const supaSSR = await createClientServer();
 	const { data: { user } } = await supaSSR.auth.getUser();
+	
+	// If no user, show login prompt with a small delay to handle OAuth redirects
 	if (!user) {
 		return (
 			<main className="min-h-screen px-6 py-10">
 				<div className="mx-auto max-w-3xl rounded-2xl bg-white backdrop-blur ring-1 ring-[#E5E7EB] p-6">
-					<p className="text-[#374151]">Please <Link className="underline" href="/login">login</Link> to view your purchases.</p>
+					<div className="text-center">
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1E3A8A] mx-auto mb-4"></div>
+						<p className="text-[#374151] mb-4">Please <Link className="underline" href="/login">login</Link> to view your purchases.</p>
+						<p className="text-sm text-[#6B7280]">If you just signed in with Google, please wait a moment...</p>
+					</div>
 				</div>
 			</main>
 		);

@@ -8,15 +8,18 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClientServer();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     
-    if (!error) {
+    if (!error && data.session) {
+      // Wait a moment to ensure session is properly set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Redirect to the specified next URL or default to account page
       return NextResponse.redirect(`${requestUrl.origin}${next}`);
     }
   }
 
   // If there's an error or no code, redirect to login with error message
-  return NextResponse.redirect(`${requestUrl.origin}/login?error=Unable to confirm email. Please try again.`);
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=Unable to authenticate with Google. Please try again.`);
 }
 
